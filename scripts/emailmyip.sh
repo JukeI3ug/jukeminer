@@ -9,7 +9,7 @@ then
 echo "To: keymaster@iron-key.com
 From: bcwc.crypto@gmail.com
 Subject: Mining Rig IP Updated
-Your new IP address is ${IPADDRESS}. Go to <a href='http://${IPADDRESS}/ethminer.php'>http://${IPADDRESS}/ethminer.php</a> to launch ETH. Go to <a href='http://${IPADDRESS}/zecminer.php'>http://${IPADDRESS}/zecminer.php</a> to launch ZEC." | ssmtp keymaster@iron-key.com
+Your new IP address is ${IPADDRESS}." | ssmtp keymaster@iron-key.com
 
 #update the IP address into a file in the user's home directory
 echo ${IPADDRESS} >| /opt/scripts/current_ip
