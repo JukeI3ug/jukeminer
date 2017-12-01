@@ -6,10 +6,10 @@ IPADDRESS=$(/sbin/ifconfig enp5s0 | sed -n 's/.*inet addr:\([^ ]*\).*/\1/p')
 if [[ "${IPADDRESS}" != $(cat /opt/scripts/current_ip) ]]
 then
 #if it has then send an email
-echo "To: keymaster@iron-key.com
+echo "To: marcelquarto@yahoo.com
 From: bcwc.crypto@gmail.com
 Subject: Mining Rig IP Updated
-Your new IP address is ${IPADDRESS}." | ssmtp keymaster@iron-key.com
+Your new IP address is ${IPADDRESS}." | ssmtp marcelquarto@yahoo.com
 
 #update the IP address into a file in the user's home directory
 echo ${IPADDRESS} >| /opt/scripts/current_ip
