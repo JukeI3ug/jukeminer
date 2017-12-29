@@ -7,16 +7,6 @@
 # by Boris Dimitrov <dimiroll@gmail.com> in 2016.
 # Use at your own risk!
 #
-# Suggested installation:
-#
-#     Unpack somewhere, say in directory
-#
-#         ${HOME}/set-gpu-fans
-#
-#     and create a link there from /opt, like so
-#
-#         ln -sf ${HOME}/set-gpu-fans /opt/set-gpu-fans
-#
 # Already running an X server?
 #
 #     Make sure you are not running an X server.  This tool is meant
@@ -28,10 +18,6 @@
 #    sudo tcsh
 #    ./cool_gpu >& controller.log &
 #    tail -f controller.log
-#
-# Seems to work fine on headless ubuntu systems with one or two compute GPUs.
-# Not intended to run automatically at system startup, sorry!  However,
-# once kicked off, should be good until reboot.
 #
 # See 'nvscmd' script for the rudimentary fan control policy (one designed
 # to eek out a few percent more perf with very noticeable but still
@@ -49,15 +35,16 @@ pciid=`lspci  | sed -n -e '/VGA compatib.*NVIDIA/s/^\(..\):\(..\).\(.\).*/printf
 disp=0
 for s in `eval ${pciid}`
 do \
-    cfg=`mktemp /tmp/xorg-XXXXXXXX.conf`
-    sed -e s,@GPU_BUS_ID@,${s},    \
-        -e s,@SET_GPU_DIR@,${dir}, \
-        ${dir}/xorg.conf >> ${cfg}
+    #cfg=`mktemp /tmp/xorg-XXXXXXXX.conf`
+    #sed -e s,@GPU_BUS_ID@,${s},    \
+    #    -e s,@SET_GPU_DIR@,${dir}, \
+    #    ${dir}/xorg.conf >> ${cfg}
     # we keep one X server per GPU running indefinitely
     # (if we let the X server die, the fan config does not persist, no matter what else)
-    xinit ${dir}/nvscmd run_forever -- :${disp} -once -config ${cfg} &
+    #xinit ${dir}/nvscmd run_forever -- :${disp} -once -config ${cfg} &
+    xinit ${dir}/nvscmd ${disp} &
     disp=$((disp+1))
-    sleep 10
-    rm -f ${cfg}
+    #sleep 5
+    #rm -f ${cfg}
 done
 

@@ -1,4 +1,25 @@
 #!/bin/tcsh -f
+if ("x$1" == "xrun_forever") then
+    @ run_forever = 1
+    shift
+else
+    @ run_forever = 0
+endif
+
+if ("x$1" == "xstop") then
+    @ target = -1
+endif
+
+if ("x$1" == "x" || "x$1" == "xstart" || "x$1" == "x-display") then
+    # this means "use heuristic"
+    @ target = -3
+else
+    @ target = $1
+endif
+
+if ("x$1" != "x" && "x$1" != "x-display") then
+    shift
+endif
 
 # OVERCLOCKING
 # experimental GPU overclocking
@@ -14,45 +35,39 @@
 
 #set test=(`/usr/bin/nvidia-smi dmon -i 0 -s p -c 1 | sort -n -k3 | tail -1`)
 set count=(`/usr/bin/nvidia-smi -i 0 --query-gpu=count --format=csv,noheader`)
-#`/usr/bin/nvidia-xconfig --allow-empty-initial-configuration --cool-bits=28 --enable-all-gpus`
-#/usr/bin/nvidia-smi -pm 1
-
 @ cardIteratorMax = $count
 @ cardIterator = 0
-@ target = 40
+@ target = 50
 
 while (1)
 	while ($cardIterator < $cardIteratorMax)
 	 # TEST TEMP and SET FAN SPEED
 	 @ temp = `/usr/bin/nvidia-smi -i $cardIterator --format=csv,noheader --query-gpu=temperature.gpu`
 	 if (${temp} <= 40) then
-	  @ target = 40
-	 endif
-	 if (${temp} > 40 && ${temp} <= 45) then
-	  @ target = 45
-	 endif
-	 if (${temp} > 45 && ${temp} <= 55) then
 	  @ target = 50
 	 endif
-	 if (${temp} > 55 && ${temp} <= 60) then
+	 if (${temp} > 40 && ${temp} <= 45) then
 	  @ target = 55
 	 endif
-         if (${temp} > 60 && ${temp} <= 65) then
-          @ target = 60
-         endif
-	 if (${temp} > 65 && ${temp} <= 70) then
+	 if (${temp} > 45 && ${temp} <= 55) then
+	  @ target = 60
+	 endif
+	 if (${temp} > 55 && ${temp} <= 65) then
 	  @ target = 65
 	 endif
+	 if (${temp} > 65 && ${temp} <= 70) then
+	  @ target = 75
+	 endif
 	 if (${temp} > 70 && ${temp} <= 75) then
-	  @ target = 70
+	  @ target = 80
 	 endif
 	 if (${temp} > 75) then
-	  @ target = 75
+	  @ target = 85
 	 endif
 	
 	 echo "Current temperature is ${temp}.  Setting fan speed to ${target}."
 
-	 /usr/bin/nvidia-settings -a '[gpu:'${cardIterator}']/GPUFanControlState=1' -a '[fan:'${cardIterator}']/GPUTargetFanSpeed='${target}
+	 /usr/bin/nvidia-settings -a '[gpu:'${cardIterator}']/GPUFanControlState=1' -a '[fan:0]/GPUTargetFanSpeed='${target}  $*
 
 	 @ cardIterator += 1
 	end
